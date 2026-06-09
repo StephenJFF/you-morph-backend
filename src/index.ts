@@ -1,39 +1,54 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import userRoutes from './routes/userRoutes';
-import orgRoutes from './routes/orgRoutes';
-import checkinRoutes from './routes/checkinRoutes';
-import coachRoutes from './routes/coachRoutes';
-import brandingRoutes from './routes/brandingRoutes';
-import authRoutes from './routes/authRoutes';
-import subscriptionRoutes from './routes/subscriptionRoutes';
-import premiumRoutes from './routes/premiumRoutes';
-import { authenticateToken } from './utils/authMiddleware';
+import express, { Express, Request, Response, NextFunction } from 'express'
+import cors from 'cors'
+import dotenv from 'dotenv'
 
-dotenv.config();
+dotenv.config()
 
-const app = express();
-const PORT = Number(process.env.PORT) || 3000;
+const app: Express = express()
+const PORT = process.env.PORT || 3001
 
-app.use(cors());
-app.use(express.json());
+// Middleware
+app.use(cors())
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
-// Public routes
-app.use('/auth', authRoutes);
-app.use('/subscriptions', subscriptionRoutes);
-app.use('/premium', premiumRoutes);
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
-});
+// Health check endpoint
+app.get('/api/health', (req: Request, res: Response) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() })
+})
 
-// Protected routes
-app.use('/users', authenticateToken, userRoutes);
-app.use('/organizations', authenticateToken, orgRoutes);
-app.use('/checkins', authenticateToken, checkinRoutes);
-app.use('/coaches', authenticateToken, coachRoutes);
-app.use('/branding', authenticateToken, brandingRoutes);
+// API Routes
+app.use('/api/auth', (req: Request, res: Response) => {
+  res.json({ message: 'Auth routes coming soon' })
+})
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on http://0.0.0.0:${PORT}`);
-});
+app.use('/api/users', (req: Request, res: Response) => {
+  res.json({ message: 'User routes coming soon' })
+})
+
+app.use('/api/programs', (req: Request, res: Response) => {
+  res.json({ message: 'Program routes coming soon' })
+})
+
+app.use('/api/workouts', (req: Request, res: Response) => {
+  res.json({ message: 'Workout routes coming soon' })
+})
+
+app.use('/api/nutrition', (req: Request, res: Response) => {
+  res.json({ message: 'Nutrition routes coming soon' })
+})
+
+// 404 handler
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ error: 'Not Found' })
+})
+
+// Error handler
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack)
+  res.status(500).json({ error: 'Internal Server Error' })
+})
+
+app.listen(PORT, () => {
+  console.log(`✅ Server running on http://localhost:${PORT}`)
+})
